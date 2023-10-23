@@ -1,0 +1,3 @@
+/home/ilan/raytracer/build/CMakeFiles/raytracer.dir
+/home/ilan/raytracer/build/CMakeFiles/edit_cache.dir
+/home/ilan/raytracer/build/CMakeFiles/rebuild_cache.dir
