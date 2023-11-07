@@ -21,6 +21,10 @@ class vec3{
         double& operator[](int i){return e[i];} // for write properties 
         vec3 operator-() const {return vec3(-e[0], -e[1], -e[2]);}
 
+        static vec3 random_vec(){return vec3(double_random(), double_random(), double_random());}
+
+        static vec3 random_vec(double min, double max){return vec3(double_random(min, max), double_random(min, max), double_random(min, max));}
+
         vec3& operator+=(const vec3 other){
             e[0] += other.e[0];
             e[1] += other.e[1];
@@ -40,7 +44,7 @@ class vec3{
         vec3& operator/=(double x){
             return *this *= (1/x);
         }
-        
+         
         double length_squared() const {
             return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
         }
@@ -93,6 +97,29 @@ inline vec3 cross(const vec3& u, const vec3& v){
 
 inline vec3 unit_vector(vec3 v){
     return v / v.length();
+}
+
+inline vec3 random_in_unit_sphere(){
+    while(true){
+        auto p = vec3::random_vec(-1, 1);
+        if(p.length_squared() < 1){
+            return p;
+        }
+    }
+}
+
+inline vec3 unit_vector_in_unit_sphere(){
+    return unit_vector(random_in_unit_sphere());
+}
+
+inline vec3 random_in_hemisphere(const vec3& normal){
+    vec3 random_on_sphere = unit_vector_in_unit_sphere();
+
+    if(dot(random_on_sphere, normal) > 0){
+        return random_on_sphere;
+    } else {
+        return -random_on_sphere;
+    }
 }
 
 #endif

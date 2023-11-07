@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/ilan/raytracer/build",
+  "command": "/usr/bin/g++ -g -o CMakeFiles/raytracer.dir/src/main.cc.o -c /home/ilan/raytracer/src/main.cc",
+  "file": "/home/ilan/raytracer/src/main.cc"
+}
+]
