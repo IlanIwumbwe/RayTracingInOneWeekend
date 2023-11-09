@@ -5,7 +5,7 @@ This is my implementation of [Peter Shirley's Ray Tracing in One Weekend](https:
 This project was used as a way to explore the C++ language, while learning some graphics programming. I had lots of fun! 
 
 ## Final render
-![fig34](images/fig34.png)
+![fig34](images/fig34.png)  
 *Very cool*
 
 # Notes 
