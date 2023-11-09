@@ -1,4 +1,15 @@
-# Raytracing in One Weekend
+# Ray Tracing in One Weekend
+
+This is my implementation of [Peter Shirley's Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html#overview).  
+
+This project was used as a way to explore the C++ language, while learning some graphics programming. I had lots of fun! 
+
+## Final render
+![fig34](images/fig34.png)
+*Very cool*
+
+# Notes 
+
 ## vec3 class
 
 We create a class that defines a 3-D points. We use the same class for vectors and colour (r,g,b) values since we write less code by doing this. Nonetheless, we create aliases `point3` and `color3` to make the code more readable.
@@ -154,5 +165,167 @@ If a ray keeps 100% of its color, then the object is white, if it keeps 0% of it
 ![fig15](images/fig15.png)
 *Matte white takes on color of surroundings*
 
+### Fixing shadow acne
+
+When a ray hits the sphere, it attempts to accurately find the intersection point. This causes a problem because this point may get rounded off, leading to floating point errors. This means that the centre of the ray randomly reflected off the surface will not be at the correct place (the original hit point). It may be slightly below or above the sphere. If it is below, the reflected ray intersects with the sphere surface again, giving the effect in the render above. We fix this by hacking in a lower bound for the values of t we accept as intersections. (Intersections that are too close are ignored)
+```C++
+if(world.hit(r, interval(0.001, infinity), rec))
+```
+
+![fig16](images/fig16.png)
+*Removal of shadow acne*
+
+### True Lambertian reflection
+We introduce a Lambertian distribution, which reflects rays with a probability proportional to $\cos(\phi)$, where $\phi$ is the angle between the ray reflected ray and the surface normal. This means that the reflected ray is more likely to scatter in a direction close to the surface normal and less likely to scatter in a direction further from the surface normal. 
+
+We can create this distribution by adding a random unit vector to the surface normal.
+
+At the hit point `p` there is a surface normal `n`. The sphere has 2 sides at the hit point, and therefore only 2 unique unit spheres can be tangent to the sphere at the hit point. These spheres will be displaced from the surface by their radius. There will be one sphere in the direction of `p+n` and another in the direction of `p+n`
+
+We need to choose the sphere that is in the direction of the ray origin, then pick a random point `S` on the surface of this sphere, and send a ray from the hit point to `S`. This vector is `S-P` 
+
+![fig17](images/fig17.png)
+*So adding a random unit vector to n gives us some vector $PS$ which is what we want
+
+![fig18](images/fig18.png)
+*True Lambertian scattering*
+
+Notice how the shadows are more pronounced, and the spheres have a slight blue tint from the sky?
+
+### Using Gamma correction for correct color intensity
+
+If we render the gamut of our renderer, we see that the color intensities aren't quite right. The image above is 50% reflective, but looks rather dark.
+
+We are currently giving our image viewer data in the linear space (no gamma transform applied), yet it expects a gamma corrected image, hence why it appears inaccurately dark.
+
+This should give us a more consistent ramp from darkness to lightness
+
+![fig19](images/fig19.png)
+*Gamma corrected spheres*
+
+## Metal
+
+### Abstract class for materials
+We start by refactoring the code to have an abstract class for all material types. We need to store information about whether a material scattered a ray, and if so, which ray it scattered. 
+
+### Modelling light scatter and reflectance
+For the diffuse materials, we could make it such that they always scatter with probability `p` then attenuate with reflectance `R`, or we could make it such that they sometimes scatter with probability `1-p`, and never attenuate. 
+
+We choose the first option.
+
+### Mirrored reflection
+When a ray hits a polished metal surface, it won't be scattered randomly, here we have normal reflection.
+
+![fig20](images/fig20.png)
+
+The reflected ray is given by v + 2b.
+
+![fig21](images/fig21.png)
+*Shiny metal :)*
+
+We can have fuzzier metal surface by perturbing the reflected ray to point in a new direction.
+
+![fig22](images/fig22.png)
+*Fuzzy metal*
+
+## Dielectrics
+
+Materials such as glass and water are dielectrics. When a ray falls onto them, it splits into a reflected ray and refracted ray. We handle this by randomly choosing between reflection and refraction, generating one scattered ray on each iteration.
+
+### Snell's law
+Refraction is described by $$\eta \sin(\theta)=\eta'\sin(\theta')$$
+![fig23](fig23.png)
+*Geometry of Snell's law*
+
+$\eta$ is refractive index for air, usually 1, $\eta'$ is refractive index for glass = 1.3-1.7, diamond = 2.4
+
+![fig24](images/fig24.png)
+*A surface that always refracts*
+
+### Total internal reflection
+When the ray is in a material of higher refractive index, sometimes, there's no real solution to Snell's law.
+$$\sin(\theta')=\frac{\eta}{\eta'}\sin(\theta)$$
+
+The left hand side cannot be greater than 1, so if $\frac{\eta}{\eta'}\sin(\theta) > 1$, the material cannot refract, and should therefore reflect the ray.
+
+$\cos(\theta)=R.n$ and $\sin(\theta)=\sqrt{ 1-\cos^2(\theta) }$ 
+
+So we can check whether refraction is possible before performing it.
+
+![fig25](images/fig25.png)
+*TIR check*
+
+### Schlick approximation
+
+Real glass has reflectivity that varies with angle. We can approximate this behaviour using a polynomial approximation by Christopher Schlick.
+
+![fig26](images/fig26.png)
+*Reflectivity varying with angle*
+
+## Positionable camera
+
+We decide on using a vertical FOV. We can move the focal distance from the $z=-1$ plane to some other plane, as long as we make h **a ratio to this distance.**  
+
+![fig27](images/fig27.png)
+
+We see that $h=\tan\left( \frac{\theta}{2} \right)$ (Remember that $h$ is a ratio)
+
+![fig28](images/fig28.png)
+*We see a wide angle view of 2 spheres touching each other*
+
+## Positioning and orientating the camera
+
+We define the point the camera is to be `lookfrom` and the point at which we are looking to be `lookat`. Next, we need to define a way to rotate the camera around the `lookfrom-lookat` axis. 
+
+We define an up vector for the camera. We can use any up vector, so long as it isn't parallel to the direction in which we are looking. We project this vector onto the plane orthogonal to the direction in which we are looking.  We can produce an orthonormal set of vectors $(u,v,w)$ that define the camera's orientation. 
+
+![fig29](fig29.png)
+
+![fig30](images/fig30.png)
+## Defocus blur
+
+How can we simulate the effect of materials appearing in and out of focus based on distance from the camera. 
+
+Why does this happen in real cameras?
+
+Real cameras use a large hole to let in light instead of a pin hole. Leaving the design at this would defocus everything, so a lens is added in front of the film. This makes it such that there's a certain distance at which objects are in focus, and are linearly out of focus the further away from this distance they are. This distance is the *focus distance.*
+
+Note that this is different from the *focal distance* which is the distance between the camera centre and the image plane. However, in our model, these will be the same since we place our pixel grid onto the focus plane. 
+
+In a real camera, this focus distance is dependent on the distance between the lens and the film. 
+
+### Thin-lens approximation
+
+Send rays from an infinitely small lens towards the pixel of interest on the focus plane, where everything on this plane is in perfect focus. In practise, we accomplish this by placing the viewport on the focus plane.
+
+Putting everything together:
+1. The focus distance is orthogonal to the viewing direction
+2. The focus distance is the distance between the camera centre and the focus plane
+3. The viewport lies on the focus plane, centred on the camera view direction vector
+4. Grid of pixel locations lies inside the focus plane
+5. Random image sample locations are chosen from the region around the current pixel
+6. Camera sends ray from a random point on the lens to the image sample location
+
+### Generating sample rays
+
+We will construct a disk centred at the camera centre. The larger the disk, the larger the defocus blur. 
+
+![fig31](images/fig31.png)
+*Blur*
+## Final render
+
+Let's add a bunch of random spheres into the scene
 
 
+# Plans for the future
+- Adding solid textures
+- Adding surface textures
+- Adding multithreading support
+
+# What's going on?
+
+![fig32](images/fig32.png)
+*Too close to metal sphere*
+
+![fig33](images/fig33.png)
+*Ground too small*

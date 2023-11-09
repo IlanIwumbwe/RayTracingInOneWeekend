@@ -21,9 +21,9 @@ class vec3{
         double& operator[](int i){return e[i];} // for write properties 
         vec3 operator-() const {return vec3(-e[0], -e[1], -e[2]);}
 
-        static vec3 random_vec(){return vec3(double_random(), double_random(), double_random());}
+        static vec3 random(){return vec3(double_random(), double_random(), double_random());}
 
-        static vec3 random_vec(double min, double max){return vec3(double_random(min, max), double_random(min, max), double_random(min, max));}
+        static vec3 random(double min, double max){return vec3(double_random(min, max), double_random(min, max), double_random(min, max));}
 
         bool near_zero() const {
             auto s = 1e-9;
@@ -120,7 +120,17 @@ inline vec3 refract(const vec3& r, const double eta_ratio, const vec3& n){
 
 inline vec3 random_in_unit_sphere(){
     while(true){
-        auto p = vec3::random_vec(-1, 1);
+        auto p = vec3::random(-1, 1);
+        if(p.length_squared() < 1){
+            return p;
+        }
+    }
+}
+
+inline vec3 random_in_unit_disk(){
+    while(true){
+        auto p = vec3(double_random(-1,1), double_random(-1,1), 0);
+
         if(p.length_squared() < 1){
             return p;
         }
