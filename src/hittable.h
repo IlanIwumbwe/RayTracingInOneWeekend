@@ -3,10 +3,13 @@
 
 #include "ray.h"
 
+class material;   // tells the compiler that this class will be defined later, solves circular import issue
+
 class hit_record{
     public:
         point3 p;
         double t;
+        shared_ptr<material> mat;
         vec3 normal;
         bool front_face;
 

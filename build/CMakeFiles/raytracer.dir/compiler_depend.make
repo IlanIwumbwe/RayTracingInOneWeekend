@@ -243,7 +243,8 @@ CMakeFiles/raytracer.dir/src/main.cc.o: ../src/main.cc \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
   ../src/sphere.h \
-  ../src/camera.h
+  ../src/camera.h \
+  ../src/material.h
 
 
 ../src/camera.h:
@@ -293,6 +294,8 @@ CMakeFiles/raytracer.dir/src/main.cc.o: ../src/main.cc \
 /usr/include/x86_64-linux-gnu/bits/iscanonical.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
+
+../src/material.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 

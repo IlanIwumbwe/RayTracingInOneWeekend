@@ -194,4 +194,4 @@ CMakeFiles/raytracer.dir/src/main.cc.o: /home/ilan/raytracer/src/main.cc \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc /home/ilan/raytracer/src/sphere.h \
- /home/ilan/raytracer/src/camera.h
+ /home/ilan/raytracer/src/camera.h /home/ilan/raytracer/src/material.h

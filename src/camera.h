@@ -3,13 +3,15 @@
 
 #include "hittable.h"
 #include "rtweekend.h"
+#include "material.h"
 
 class camera{
     public:
         double ascpect_ratio = 1.0;
         int image_width = 100;
         int samples_per_pixel = 10;
-
+        int max_depth = 10;
+    
         void render(const hittable& world){
             initialise();
 
@@ -22,7 +24,7 @@ class camera{
 
                     for(int k = 0; k < samples_per_pixel; ++k){
                         ray r = get_ray(i, j); 
-                        pixel_color += ray_color(r, world);
+                        pixel_color += ray_color(r,max_depth, world);
                     }
 
                     write_color(std::cout, pixel_color, samples_per_pixel);
@@ -39,15 +41,22 @@ class camera{
         vec3 pixel_delta_u;
         vec3 pixel_delta_v;
 
-        color ray_color(ray& r, const hittable& world){
+        color ray_color(ray& r, int max_depth, const hittable& world){
+            if(max_depth <= 0){
+                return color(0,0,0);
+            }
+
             hit_record rec;
 
-            if(world.hit(r, interval(0, infinity), rec)){
-                vec3 direction = random_in_hemisphere(rec.normal);
-                ray r = ray(rec.p, direction);
-                return 0.5 * ray_color(r, world);
+            if(world.hit(r, interval(0.001, infinity), rec)){
+                color attenuation;
+                ray scattered;
 
-                //return 0.5*(rec.normal + color(1,1,1));
+                if(rec.mat->scatter(r, attenuation, rec, scattered)){
+                    return attenuation * ray_color(scattered, max_depth-1, world);
+                }
+
+                return color(0,0,0);
             }
 
             vec3 unit_direction = unit_vector(r.direction());

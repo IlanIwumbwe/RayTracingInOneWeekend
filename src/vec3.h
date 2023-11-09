@@ -25,6 +25,12 @@ class vec3{
 
         static vec3 random_vec(double min, double max){return vec3(double_random(min, max), double_random(min, max), double_random(min, max));}
 
+        bool near_zero() const {
+            auto s = 1e-9;
+
+            return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+        }
+
         vec3& operator+=(const vec3 other){
             e[0] += other.e[0];
             e[1] += other.e[1];
@@ -97,6 +103,19 @@ inline vec3 cross(const vec3& u, const vec3& v){
 
 inline vec3 unit_vector(vec3 v){
     return v / v.length();
+}
+
+inline vec3 reflect(const vec3& r, const vec3& n){
+    double b_mag = 2*dot(r,n);
+    vec3 b_vect = b_mag * n; // magnitude multiplied by normal
+    return r - b_vect;  // minus because r and n are pointing in different directions, so dot product will be negative
+}
+
+inline vec3 refract(const vec3& r, const double eta_ratio, const vec3& n){
+    auto cos_theta = fmin(dot(-r, n), 1.0);
+    vec3 r_out_perp = eta_ratio * (r + cos_theta*n);
+    vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_squared())) * n;
+    return r_out_perp + r_out_parallel;
 }
 
 inline vec3 random_in_unit_sphere(){
