@@ -47,7 +47,7 @@ To render a sky-like scene, we need to render a gradient that blends white and b
 
 We use linear interpolation to blend blue and white. 
 
-![fig5](images/fig5.png)
+![fig5](images/fig5.png)  
 *Blue to white gradient based on y-coordinate of ray*
 
 ## Adding spheres
@@ -73,7 +73,7 @@ This is a quadratic we can solve. Number of roots tells us about intersection of
 
 Based on this, we can write a function which receives a ray, a sphere centre and radius, then based on the determinant, tells us whether the ray hits the sphere. We can check for this in the `ray_color` function, and have it return some color if there's is a hit. So it colours pixels that correspond to a sphere we have defined in some arbitrary centre with arbitrary radius.
 
-![fig7](images/fig7.png)
+![fig7](images/fig7.png)  
 *Our first raytraced image*
 
 ## Surface normals and multiple objects
@@ -85,7 +85,7 @@ We define the normal pointing outward to be in the direction of the hit point mi
 
 We can visualise these normals using a color map on the sphere. We know these will be of unit length (between -1 and 1), so we scale each x,y,z component to be between 0 and 1, then return those as rgb values. 
 
-![fig8](images/fig8.png)
+![fig8](images/fig8.png)  
 *Shading the sphere with surface normals*
 
 ### Front faces vs back faces
@@ -126,7 +126,7 @@ When we zoom into the image, we notice the edges are have this staircase effect.
 
 We modify the code to take into account the number of samples taken per pixel, such that we average out the samples before writing the color to the `ppm` file.
 
-![fig10](images/fig10.png)
+![fig10](images/fig10.png)  
 *Anti-aliasing to produce smooth edges*
 
 ## Diffuse materials
@@ -157,12 +157,13 @@ Steps taken to generate random vectors within unit sphere:
 
 If a ray keeps 100% of its color, then the object is white, if it keeps 0% of its color, then the object is black. In the demo, we have a recursive call to ray color, where we pass a ray whose origin is the hit point, in the direction of the random vector in the hemisphere. We multiply that function call with 0.5, so we want the ray to keep 50% of its color, we expect grey spheres.
 
-![fig12](images/fig12.png)
+![fig12](images/fig12.png)  
 *Matte material grey*
 
-![fig13](images/fig13.png)
+![fig13](images/fig13.png)  
 *Matte material black*
-![fig15](images/fig15.png)
+
+![fig15](images/fig15.png)  
 *Matte white takes on color of surroundings*
 
 ### Fixing shadow acne
@@ -172,7 +173,7 @@ When a ray hits the sphere, it attempts to accurately find the intersection poin
 if(world.hit(r, interval(0.001, infinity), rec))
 ```
 
-![fig16](images/fig16.png)
+![fig16](images/fig16.png)  
 *Removal of shadow acne*
 
 ### True Lambertian reflection
@@ -184,10 +185,10 @@ At the hit point `p` there is a surface normal `n`. The sphere has 2 sides at th
 
 We need to choose the sphere that is in the direction of the ray origin, then pick a random point `S` on the surface of this sphere, and send a ray from the hit point to `S`. This vector is `S-P` 
 
-![fig17](images/fig17.png)
+![fig17](images/fig17.png)  
 *So adding a random unit vector to n gives us some vector $PS$ which is what we want
 
-![fig18](images/fig18.png)
+![fig18](images/fig18.png)  
 *True Lambertian scattering*
 
 Notice how the shadows are more pronounced, and the spheres have a slight blue tint from the sky?
@@ -200,7 +201,7 @@ We are currently giving our image viewer data in the linear space (no gamma tran
 
 This should give us a more consistent ramp from darkness to lightness
 
-![fig19](images/fig19.png)
+![fig19](images/fig19.png)  
 *Gamma corrected spheres*
 
 ## Metal
@@ -220,12 +221,12 @@ When a ray hits a polished metal surface, it won't be scattered randomly, here w
 
 The reflected ray is given by v + 2b.
 
-![fig21](images/fig21.png)
-*Shiny metal :)*
+![fig21](images/fig21.png)  
+*Shiny metal*
 
 We can have fuzzier metal surface by perturbing the reflected ray to point in a new direction.
 
-![fig22](images/fig22.png)
+![fig22](images/fig22.png)  
 *Fuzzy metal*
 
 ## Dielectrics
@@ -234,12 +235,12 @@ Materials such as glass and water are dielectrics. When a ray falls onto them, i
 
 ### Snell's law
 Refraction is described by $$\eta \sin(\theta)=\eta'\sin(\theta')$$
-![fig23](fig23.png)
+![fig23](fig23.png)  
 *Geometry of Snell's law*
 
 $\eta$ is refractive index for air, usually 1, $\eta'$ is refractive index for glass = 1.3-1.7, diamond = 2.4
 
-![fig24](images/fig24.png)
+![fig24](images/fig24.png)  
 *A surface that always refracts*
 
 ### Total internal reflection
@@ -252,14 +253,14 @@ $\cos(\theta)=R.n$ and $\sin(\theta)=\sqrt{ 1-\cos^2(\theta) }$
 
 So we can check whether refraction is possible before performing it.
 
-![fig25](images/fig25.png)
+![fig25](images/fig25.png)  
 *TIR check*
 
 ### Schlick approximation
 
 Real glass has reflectivity that varies with angle. We can approximate this behaviour using a polynomial approximation by Christopher Schlick.
 
-![fig26](images/fig26.png)
+![fig26](images/fig26.png)  
 *Reflectivity varying with angle*
 
 ## Positionable camera
@@ -270,7 +271,7 @@ We decide on using a vertical FOV. We can move the focal distance from the $z=-1
 
 We see that $h=\tan\left( \frac{\theta}{2} \right)$ (Remember that $h$ is a ratio)
 
-![fig28](images/fig28.png)
+![fig28](images/fig28.png)  
 *We see a wide angle view of 2 spheres touching each other*
 
 ## Positioning and orientating the camera
@@ -310,7 +311,7 @@ Putting everything together:
 
 We will construct a disk centred at the camera centre. The larger the disk, the larger the defocus blur. 
 
-![fig31](images/fig31.png)
+![fig31](images/fig31.png)  
 *Blur*
 ## Final render
 
@@ -324,8 +325,8 @@ Let's add a bunch of random spheres into the scene
 
 # What's going on?
 
-![fig32](images/fig32.png)
+![fig32](images/fig32.png)  
 *Too close to metal sphere*
 
-![fig33](images/fig33.png)
+![fig33](images/fig33.png)  
 *Ground too small*
