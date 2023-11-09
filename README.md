@@ -235,7 +235,7 @@ Materials such as glass and water are dielectrics. When a ray falls onto them, i
 
 ### Snell's law
 Refraction is described by $$\eta \sin(\theta)=\eta'\sin(\theta')$$
-![fig23](fig23.png)  
+![fig23](images/fig23.png)  
 *Geometry of Snell's law*
 
 $\eta$ is refractive index for air, usually 1, $\eta'$ is refractive index for glass = 1.3-1.7, diamond = 2.4
@@ -280,7 +280,7 @@ We define the point the camera is to be `lookfrom` and the point at which we are
 
 We define an up vector for the camera. We can use any up vector, so long as it isn't parallel to the direction in which we are looking. We project this vector onto the plane orthogonal to the direction in which we are looking.  We can produce an orthonormal set of vectors $(u,v,w)$ that define the camera's orientation. 
 
-![fig29](fig29.png)
+![fig29](images/fig29.png)
 
 ![fig30](images/fig30.png)
 ## Defocus blur
